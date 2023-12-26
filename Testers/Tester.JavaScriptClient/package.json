@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "oidc-client": "^1.11.5"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  }
+}

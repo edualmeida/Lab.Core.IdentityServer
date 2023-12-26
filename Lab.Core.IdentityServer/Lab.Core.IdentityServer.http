@@ -1,0 +1,6 @@
+@Lab.Core.IdentityServer_HostAddress = http://localhost:5021
+
+GET {{Lab.Core.IdentityServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
