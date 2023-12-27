@@ -1,6 +1,7 @@
 using Duende.IdentityServer;
 using Lab.Core.IdentityServer.Data;
 using Lab.Core.IdentityServer.Models;
+using Lab.Core.IdentityServer.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,8 @@ internal static class HostingExtensions
 {
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
+        AddInfrastructure(builder);
+
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
 
@@ -84,5 +87,10 @@ internal static class HostingExtensions
             .RequireAuthorization();
 
         return app;
+    }
+
+    private static void AddInfrastructure(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddTransient<IEmailNotifier, EmailNotifier>();
     }
 }
