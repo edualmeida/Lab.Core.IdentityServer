@@ -23,4 +23,18 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="Pages\Manage\RegisterConfirmation\Index.cshtml" />
+	  <_ContentIncludedByDefault Remove="Pages\Account\DeletePersonalData\Index.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AdditionalFiles Include="Pages\Account\RegisterConfirmation\Index.cshtml" />
+	  <AdditionalFiles Include="Pages\Manage\DeletePersonalData\Index.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="Pages\_StatusMessage.cshtml" />
+	</ItemGroup>
 </Project>

@@ -5,6 +5,7 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Lab.Core.IdentityServer.Models;
 using Lab.Core.IdentityServer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,15 +14,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Lab.Core.IdentityServer.Areas.Identity.Pages.Account
+namespace Lab.Core.IdentityServer.Pages.RegisterConfirmation
 {
     [AllowAnonymous]
     public class RegisterConfirmationModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailNotifier _sender;
 
-        public RegisterConfirmationModel(UserManager<IdentityUser> userManager, IEmailNotifier sender)
+        public RegisterConfirmationModel(UserManager<ApplicationUser> userManager, IEmailNotifier sender)
         {
             _userManager = userManager;
             _sender = sender;
@@ -68,9 +69,9 @@ namespace Lab.Core.IdentityServer.Areas.Identity.Pages.Account
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 EmailConfirmationUrl = Url.Page(
-                    "/Account/ConfirmEmail",
+                    "/Account/ConfirmEmail/Index",
                     pageHandler: null,
-                    values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                    values: new { area = "Identity", userId, code, returnUrl },
                     protocol: Request.Scheme);
             }
 

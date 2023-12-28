@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Lab.Core.IdentityServer.Areas.Identity.Pages.Account.Manage
+namespace Lab.Core.IdentityServer.Pages.Account.SetPassword
 {
     public class SetPasswordModel : PageModel
     {

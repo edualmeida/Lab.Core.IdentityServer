@@ -1,5 +1,6 @@
 ﻿@page
-@model DeletePersonalDataModel
+@using Lab.Core.IdentityServer.Areas.Identity.Pages.Account.Manage
+@model Lab.Core.IdentityServer.Pages.Manage.DeletePersonalData.DeletePersonalDataModel
 @{
     ViewData["Title"] = "Delete Personal Data";
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
@@ -16,6 +17,11 @@
 <div>
     <form id="delete-user" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <div class="form-floating mb-3">
+            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+            <label asp-for="Input.Email">Email</label>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
         @if (Model.RequirePassword)
         {
             <div class="form-floating mb-3">

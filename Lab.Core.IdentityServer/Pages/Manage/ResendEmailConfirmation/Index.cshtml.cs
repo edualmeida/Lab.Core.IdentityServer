@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Lab.Core.IdentityServer.Areas.Identity.Pages.Account
+namespace Lab.Core.IdentityServer.Pages.Manage.ResendEmailConfirmation
 {
     [AllowAnonymous]
     public class ResendEmailConfirmationModel : PageModel
@@ -75,7 +75,7 @@ namespace Lab.Core.IdentityServer.Areas.Identity.Pages.Account
             var callbackUrl = Url.Page(
                 "/Account/ConfirmEmail",
                 pageHandler: null,
-                values: new { userId = userId, code = code },
+                values: new { userId, code },
                 protocol: Request.Scheme);
             await _emailSender.SendEmailAsync(
                 Input.Email,

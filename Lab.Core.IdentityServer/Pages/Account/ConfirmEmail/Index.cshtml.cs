@@ -6,19 +6,20 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lab.Core.IdentityServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Lab.Core.IdentityServer.Areas.Identity.Pages.Account
+namespace Lab.Core.IdentityServer.Pages.ConfirmEmail
 {
-    public class ConfirmEmailModel : PageModel
+    public class ConfirmEmailModel : PageModel  
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ConfirmEmailModel(UserManager<IdentityUser> userManager)
+        public ConfirmEmailModel(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
         }

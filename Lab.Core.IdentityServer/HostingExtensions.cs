@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Net.Mail;
+using System.Net;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lab.Core.IdentityServer;
 
@@ -24,7 +27,10 @@ internal static class HostingExtensions
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
 
-        builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+        builder.Services
+            .AddIdentity<ApplicationUser, IdentityRole>(options => 
+                options.SignIn.RequireConfirmedAccount = true
+            )//.AddRoles<Role>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
@@ -91,6 +97,14 @@ internal static class HostingExtensions
 
     private static void AddInfrastructure(this WebApplicationBuilder builder)
     {
+        builder.Services.AddSingleton(
+            new EmailOptions(builder.Configuration["Smtp:FromAddress"], builder.Configuration["Smtp:FromDisplayName"])
+            {
+                Host = builder.Configuration["Smtp:Host"],
+                Port = int.Parse(builder.Configuration["Smtp:Port"]),
+                Username = builder.Configuration["Smtp:Username"],
+                Password = builder.Configuration["Smtp:Password"],
+            });
         builder.Services.AddTransient<IEmailNotifier, EmailNotifier>();
     }
 }

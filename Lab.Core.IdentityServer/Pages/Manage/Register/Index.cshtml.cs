@@ -128,9 +128,9 @@ namespace Lab.Core.IdentityServer.Pages.Register
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
+                        "/Account/ConfirmEmail/Index",
                         pageHandler: null,
-                        values: new { area = "Identity", userId, code, returnUrl },
+                        values: new { userId, code, returnUrl },
                         protocol: Request.Scheme);
 
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
@@ -138,7 +138,7 @@ namespace Lab.Core.IdentityServer.Pages.Register
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });
+                        return RedirectToPage("/Account/RegisterConfirmation/Index", new { email = Input.Email, returnUrl });
                     }
                     else
                     {
