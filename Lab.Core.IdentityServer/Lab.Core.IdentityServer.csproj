@@ -27,10 +27,12 @@
 	<ItemGroup>
 	  <_ContentIncludedByDefault Remove="Pages\Manage\RegisterConfirmation\Index.cshtml" />
 	  <_ContentIncludedByDefault Remove="Pages\Account\DeletePersonalData\Index.cshtml" />
+	  <_ContentIncludedByDefault Remove="Pages\Manage\ResendEmailConfirmation\Index.cshtml" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <AdditionalFiles Include="Pages\Account\RegisterConfirmation\Index.cshtml" />
+	  <AdditionalFiles Include="Pages\Account\ResendEmailConfirmation\Index.cshtml" />
 	  <AdditionalFiles Include="Pages\Manage\DeletePersonalData\Index.cshtml" />
 	</ItemGroup>
 

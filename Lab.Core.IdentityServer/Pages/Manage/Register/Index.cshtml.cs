@@ -47,6 +47,8 @@ namespace Lab.Core.IdentityServer.Pages.Register
             _emailSender = emailSender;
         }
 
+        [TempData]
+        public string StatusMessage { get; set; }
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -125,12 +127,12 @@ namespace Lab.Core.IdentityServer.Pages.Register
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var confirmationCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    confirmationCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationCode));
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail/Index",
                         pageHandler: null,
-                        values: new { userId, code, returnUrl },
+                        values: new { userId, code = confirmationCode, returnUrl },
                         protocol: Request.Scheme);
 
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
@@ -138,7 +140,8 @@ namespace Lab.Core.IdentityServer.Pages.Register
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("/Account/RegisterConfirmation/Index", new { email = Input.Email, returnUrl });
+                        StatusMessage = $"User email: '{Input.Email}', id: '{userId}' registered successfully";
+                        return LocalRedirect(returnUrl);
                     }
                     else
                     {

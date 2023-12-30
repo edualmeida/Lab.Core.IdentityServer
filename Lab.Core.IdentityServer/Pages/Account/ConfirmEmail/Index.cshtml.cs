@@ -13,8 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Lab.Core.IdentityServer.Pages.ConfirmEmail
+namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail
 {
+    [AllowAnonymous]
     public class ConfirmEmailModel : PageModel  
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -34,7 +35,7 @@ namespace Lab.Core.IdentityServer.Pages.ConfirmEmail
         {
             if (userId == null || code == null)
             {
-                return RedirectToPage("/Index");
+                return NotFound($"Unable to load user with ID '{userId}' or code: '{code}'.");
             }
 
             var user = await _userManager.FindByIdAsync(userId);

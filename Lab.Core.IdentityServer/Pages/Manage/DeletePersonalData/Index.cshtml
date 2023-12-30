@@ -19,18 +19,18 @@
         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
         <div class="form-floating mb-3">
             <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-            <label asp-for="Input.Email">Email</label>
+            <label asp-for="Input.Email">Email of the account to be deleted</label>
             <span asp-validation-for="Input.Email" class="text-danger"></span>
         </div>
         @if (Model.RequirePassword)
         {
             <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Please enter your password." />
-                <label asp-for="Input.Password" class="form-label"></label>
+                <label asp-for="Input.Password" class="form-label">Your password to confirm the operation</label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
         }
-        <button class="w-100 btn btn-lg btn-danger" type="submit">Delete data and close my account</button>
+        <button class="w-100 btn btn-lg btn-danger" type="submit">Delete data and close the selected account</button>
     </form>
 </div>
 

@@ -18,7 +18,8 @@ namespace Lab.Core.IdentityServer.Services
                 new MailMessage(new MailAddress(options.FromAddress, options.FromDisplayName), new MailAddress(email))
                 {
                     Subject = subject,
-                    Body = htmlMessage
+                    Body = htmlMessage,
+                    IsBodyHtml = true
                 });
         }
     }

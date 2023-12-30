@@ -85,10 +85,16 @@ namespace Lab.Core.IdentityServer.Pages.Manage.DeletePersonalData
                 return NotFound($"Unable to load user with ID '{Input.Email}'.");
             }
 
-            RequirePassword = await _userManager.HasPasswordAsync(user);
+            RequirePassword = true; //await _userManager.HasPasswordAsync(user);
             if (RequirePassword)
             {
-                if (!await _userManager.CheckPasswordAsync(user, Input.Password))
+                var userAdmin = await _userManager.GetUserAsync(User);
+                if (userAdmin == null)
+                {
+                    return NotFound($"Unable to load admin user with ID '{_userManager.GetUserId(User)}'.");
+                }
+                
+                if (!await _userManager.CheckPasswordAsync(userAdmin, Input.Password))
                 {
                     ModelState.AddModelError(string.Empty, "Incorrect password.");
                     return Page();

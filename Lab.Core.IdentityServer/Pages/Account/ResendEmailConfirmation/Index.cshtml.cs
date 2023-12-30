@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Lab.Core.IdentityServer.Pages.Manage.ResendEmailConfirmation
+namespace Lab.Core.IdentityServer.Pages.Account.ResendEmailConfirmation
 {
     [AllowAnonymous]
     public class ResendEmailConfirmationModel : PageModel
