@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using Lab.Core.IdentityServer.Configuration;
 using Lab.Core.IdentityServer.Models;
 using Lab.Core.IdentityServer.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -18,11 +19,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
-namespace Lab.Core.IdentityServer.Pages.Register
+namespace Lab.Core.IdentityServer.Pages.Manage.Register
 {
+    [Authorize(Roles = RoleNames.AdminRole)]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -31,13 +34,15 @@ namespace Lab.Core.IdentityServer.Pages.Register
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailNotifier _emailSender;
-
+        private readonly RoleManager<IdentityRole> _roleManager;
+        
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailNotifier emailSender)
+            IEmailNotifier emailSender,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -45,6 +50,7 @@ namespace Lab.Core.IdentityServer.Pages.Register
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         [TempData]
@@ -66,48 +72,40 @@ namespace Lab.Core.IdentityServer.Pages.Register
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
-        public IList<AuthenticationScheme> ExternalLogins { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public class InputModel
-        {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [EmailAddress]
-            [Display(Name = "Email")]
-            public string Email { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [DataType(DataType.Password)]
-            [Display(Name = "Password")]
-            public string Password { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
-        }
-
-
-        public async Task OnGetAsync(string returnUrl = null)
+        public IList<AuthenticationScheme> ExternalLogins { get; set; }        
+        public SelectList Roles { get; set; }
+        public bool IsEdit { get; set; }
+        
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null, string userId = null)
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            Roles = new SelectList(_roleManager.Roles, "Name", "Name");
+            
+            Input = new InputModel
+            {
+                SelectedRole = _roleManager.Roles.FirstOrDefault()?.Name,
+            };
+            
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return NotFound($"Unable to load user with ID '{userId}'.");
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                Input = new InputModel
+                {
+                    Email = user.Email,
+                    SelectedRole = roles.FirstOrDefault(),
+                    UserId = userId
+                };
+            }
+            
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -116,16 +114,35 @@ namespace Lab.Core.IdentityServer.Pages.Register
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                if (!string.IsNullOrEmpty(Input.UserId))
+                {
+                    var editUser = await _userManager.FindByIdAsync(Input.UserId);
+                    if (editUser == null)
+                    {
+                        return NotFound($"Unable to load user with ID '{Input.UserId}'.");
+                    }
+                    
+                    await _userStore.SetUserNameAsync(editUser, Input.Email, CancellationToken.None);
+                    await _emailStore.SetEmailAsync(editUser, Input.Email, CancellationToken.None);
+                    await _userManager.RemoveFromRolesAsync(editUser, _roleManager.Roles.ToList().Select(x=>x.Name));
+                    await _userManager.AddToRoleAsync(editUser, Input.SelectedRole);
+                    
+                    StatusMessage = $"User email: '{Input.Email}', id: '{Input.UserId}' saved successfully";
+                    return Page();
+                }
+                
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
+                var result = await _userManager.CreateAsync(user);
+                
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
+                    await _userManager.AddToRoleAsync(user, Input.SelectedRole);
+                    
                     var userId = await _userManager.GetUserIdAsync(user);
                     var confirmationCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     confirmationCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationCode));

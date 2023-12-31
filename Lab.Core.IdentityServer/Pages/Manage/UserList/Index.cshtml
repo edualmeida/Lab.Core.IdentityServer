@@ -1,0 +1,95 @@
+﻿@page
+@model Lab.Core.IdentityServer.Pages.Manage.UserList.Index
+@{
+    var prevDisabled = !Model.View.Users.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.View.Users.HasNextPage ? "disabled" : "";
+}
+
+<div class="grants-page">
+    <div class="lead">
+        <h1>User List</h1>
+        <p>Below is the list of applications users.</p>
+    </div>
+    <p>
+        <a asp-page="/Manage/Register/Index">Create New</a>
+    </p>
+    
+    @if (Model.View.Users.Any() == false)
+    {
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="alert alert-info">
+                    There are no users
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <form asp-page="./Index" method="get">
+            <div class="form-actions no-color">
+                <p>
+                    Find by name: <input type="text" name="SearchString" value="@Model.CurrentFilter" />
+                    <button type="submit" class="btn btn-lg">Search</button> |
+                    <a asp-page="./Index">Back to full List</a>
+                </p>
+            </div>
+        </form>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <a asp-page="./Index" asp-route-sortOrder="@Model.NameSort"
+                           asp-route-currentFilter="@Model.CurrentFilter">
+                            @Html.DisplayNameFor(model => model.View.Users.First().UserName)
+                        </a>
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.View.Users.First().Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.View.Users.First().LockoutEnd)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.View.Users)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.LockoutEnd)
+                        </td>
+                        <td>
+                            <a asp-page="/Manage/Register/Index" asp-route-userId="@item.Id">Edit</a> |
+                            <a asp-page="/Manage/DeletePersonalData/Index" asp-route-userId="@item.Id">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <a asp-page="./Index"
+           asp-route-sortOrder="@Model.CurrentSort"
+           asp-route-pageIndex="@(Model.View.Users.PageIndex - 1)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           class="btn btn-default @prevDisabled">
+            Previous
+        </a>
+        <a asp-page="./Index"
+           asp-route-sortOrder="@Model.CurrentSort"
+           asp-route-pageIndex="@(Model.View.Users.PageIndex + 1)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           class="btn btn-default @nextDisabled">
+            Next
+        </a>
+
+    }
+</div>

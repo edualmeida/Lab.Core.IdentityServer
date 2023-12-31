@@ -30,7 +30,8 @@ internal static class HostingExtensions
         builder.Services
             .AddIdentity<ApplicationUser, IdentityRole>(options => 
                 options.SignIn.RequireConfirmedAccount = true
-            )//.AddRoles<Role>()
+            )
+            .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 

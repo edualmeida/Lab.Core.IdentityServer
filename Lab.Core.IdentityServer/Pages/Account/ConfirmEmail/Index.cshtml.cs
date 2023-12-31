@@ -19,18 +19,21 @@ namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail
     public class ConfirmEmailModel : PageModel  
     {
         private readonly UserManager<ApplicationUser> _userManager;
-
-        public ConfirmEmailModel(UserManager<ApplicationUser> userManager)
+        private readonly ILogger<ConfirmEmailModel> _logger;
+        
+        public ConfirmEmailModel(
+            UserManager<ApplicationUser> userManager,
+            ILogger<ConfirmEmailModel> logger)
         {
             _userManager = userManager;
+            _logger = logger;
         }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         [TempData]
         public string StatusMessage { get; set; }
+        [BindProperty]
+        public InputModel Input { get; set; }
+        
         public async Task<IActionResult> OnGetAsync(string userId, string code)
         {
             if (userId == null || code == null)
@@ -45,8 +48,45 @@ namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail
             }
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-            var result = await _userManager.ConfirmEmailAsync(user, code);
+
+            Input = new InputModel()
+            {
+                UserId = userId,
+                Code = code
+            };
+
+            return Page();
+        }
+        
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            var user = await _userManager.FindByIdAsync(Input.UserId);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
+            if (!addPasswordResult.Succeeded)
+            {
+                foreach (var error in addPasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return Page();
+            }
+
+            _logger.LogInformation("User changed their password successfully.");
+            StatusMessage = "Your password has been changed.";
+
+            var result = await _userManager.ConfirmEmailAsync(user, Input.Code);
             StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
+            
             return Page();
         }
     }

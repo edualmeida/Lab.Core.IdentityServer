@@ -38,5 +38,6 @@
 
 	<ItemGroup>
 	  <Content Remove="Pages\_StatusMessage.cshtml" />
+	  <Content Remove="Pages\Shared\_ManageNav.cshtml" />
 	</ItemGroup>
 </Project>
