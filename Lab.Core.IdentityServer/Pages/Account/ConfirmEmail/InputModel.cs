@@ -5,7 +5,8 @@ namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail;
 public class InputModel
 {
     public string UserId { get; set; }
-    public string Code { get; set; }
+    public string ReturnUrl { get; set; }
+    
     [Required]
     [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
     [DataType(DataType.Password)]

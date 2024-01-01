@@ -33,8 +33,9 @@ namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail
         public string StatusMessage { get; set; }
         [BindProperty]
         public InputModel Input { get; set; }
+        public bool FailedToConfirm { get; set; }
         
-        public async Task<IActionResult> OnGetAsync(string userId, string code)
+        public async Task<IActionResult> OnGetAsync(string userId, string code, string returnUrl)
         {
             if (userId == null || code == null)
             {
@@ -49,11 +50,17 @@ namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail
             
             string coded  = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, coded);
-            HttpContext.Session.SetString("confirmationCode", code);
+            if (!result.Succeeded)
+            {
+                StatusMessage = "Error confirming your email.";
+                _logger.LogError(result.Errors.FirstOrDefault()?.ToString());
+                FailedToConfirm = true;
+            }
+            
             Input = new InputModel()
             {
                 UserId = userId,
-                Code = code
+                ReturnUrl = returnUrl
             };
 
             return Page();
@@ -82,18 +89,10 @@ namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail
                 }
                 return Page();
             }
-
-            string code  = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(HttpContext.Session.GetString("confirmationCode")));
-            var result = await _userManager.ConfirmEmailAsync(user, code);
             
             StatusMessage = "Thank you for confirming your email.";
-            if (!result.Succeeded)
-            {
-                StatusMessage = "Error confirming your email.";
-                _logger.LogError(result.Errors.FirstOrDefault()?.ToString());    
-            }
             
-            return Page();
+            return LocalRedirect(Input.ReturnUrl);
         }
     }
 }

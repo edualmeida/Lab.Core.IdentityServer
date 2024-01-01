@@ -9,6 +9,7 @@ using Serilog;
 using System.Net.Mail;
 using System.Net;
 using System.Reflection;
+using Duende.IdentityServer.AspNetIdentity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lab.Core.IdentityServer;
@@ -62,7 +63,8 @@ internal static class HostingExtensions
                 options.ConfigureDbContext = b => b.UseNpgsql(connectionString,
                     sql => sql.MigrationsAssembly(migrationsAssembly));
             })
-            .AddAspNetIdentity<ApplicationUser>();
+            .AddAspNetIdentity<ApplicationUser>()
+            .AddProfileService<ProfileService<ApplicationUser>>();
         
         builder.Services.AddAuthentication()
             .AddGoogle(options =>
