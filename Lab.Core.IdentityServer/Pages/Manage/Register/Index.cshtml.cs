@@ -123,6 +123,8 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
                         return NotFound($"Unable to load user with ID '{Input.UserId}'.");
                     }
                     
+                    SetUserFields(editUser);
+                    
                     await _userStore.SetUserNameAsync(editUser, Input.Email, CancellationToken.None);
                     await _emailStore.SetEmailAsync(editUser, Input.Email, CancellationToken.None);
                     await _userManager.RemoveFromRolesAsync(editUser, _roleManager.Roles.ToList().Select(x=>x.Name));
@@ -133,6 +135,8 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
                 }
                 
                 var user = CreateUser();
+
+                SetUserFields(user);
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -175,6 +179,17 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
 
             // If we got this far, something failed, redisplay form
             return Page();
+        }
+
+        private void SetUserFields(ApplicationUser user)
+        {
+            user.FullName = Input.FullName;
+            user.BirthDate = Input.BirthDate;
+            user.Address1 = Input.Address1;
+            user.Address2 = Input.Address2;
+            user.City = Input.City;
+            user.County = Input.County;
+            user.PostalCode = Input.PostalCode;
         }
 
         private ApplicationUser CreateUser()

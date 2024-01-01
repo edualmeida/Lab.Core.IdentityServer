@@ -23,9 +23,39 @@
             <div class="form-floating mb-3">
                 <label asp-for="Input.SelectedRole">Role</label>
                 <select asp-for="Input.SelectedRole" asp-items="Model.Roles" class="form-control">
-                    <option>Select one</option>
                 </select>
             </div>
+            <div class="form-floating mb-3">
+                <label asp-for="Input.FullName">Full Name</label>
+                <input asp-for="Input.FullName" class="form-control" autocomplete="fullname" aria-required="true" placeholder="Full Name" maxlength="300"/>
+                <span asp-validation-for="Input.FullName" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <label asp-for="Input.BirthDate"></label>
+                <input asp-for="Input.BirthDate" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Input.BirthDate" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <label asp-for="Input.Address1">Address</label>
+                <input asp-for="Input.Address1" class="form-control" autocomplete="address1" aria-required="true" placeholder="Address line 1"/>
+                <span asp-validation-for="Input.Address1" class="text-danger"></span>
+                <input asp-for="Input.Address2" class="form-control" autocomplete="address2" placeholder="Address line 2 (optional)"/>
+            </div>
+            <div class="form-floating mb-3">
+                <label asp-for="Input.City">City</label>
+                <input asp-for="Input.City" class="form-control" autocomplete="city" placeholder="City"/>
+                <span asp-validation-for="Input.City" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <label asp-for="Input.County">County</label>
+                <input asp-for="Input.County" class="form-control" autocomplete="county" placeholder="County"/>
+                <span asp-validation-for="Input.County" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <label asp-for="Input.PostalCode">EIR Code</label>
+                <input asp-for="Input.PostalCode" class="form-control" autocomplete="postalcode" placeholder="EIR Code"/>
+                <span asp-validation-for="Input.PostalCode" class="text-danger"></span>
+            </div>            
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">@btnName</button>
         </form>
     </div>
