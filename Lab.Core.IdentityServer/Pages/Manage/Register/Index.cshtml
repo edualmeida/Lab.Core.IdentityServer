@@ -22,7 +22,9 @@
             </div>
             <div class="form-floating mb-3">
                 <label asp-for="Input.SelectedRole">Role</label>
-                <select name="roles" asp-for="Input.SelectedRole" asp-items="Model.Roles" class="form-control"></select>
+                <select asp-for="Input.SelectedRole" asp-items="Model.Roles" class="form-control">
+                    <option>Select one</option>
+                </select>
             </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">@btnName</button>
         </form>

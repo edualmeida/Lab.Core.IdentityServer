@@ -46,9 +46,10 @@ namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail
             {
                 return NotFound($"Unable to load user with ID '{userId}'.");
             }
-
-            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-
+            
+            string coded  = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            var result = await _userManager.ConfirmEmailAsync(user, coded);
+            HttpContext.Session.SetString("confirmationCode", code);
             Input = new InputModel()
             {
                 UserId = userId,
@@ -71,6 +72,7 @@ namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            await _userManager.RemovePasswordAsync(user);
             var addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
             if (!addPasswordResult.Succeeded)
             {
@@ -81,11 +83,15 @@ namespace Lab.Core.IdentityServer.Pages.Account.ConfirmEmail
                 return Page();
             }
 
-            _logger.LogInformation("User changed their password successfully.");
-            StatusMessage = "Your password has been changed.";
-
-            var result = await _userManager.ConfirmEmailAsync(user, Input.Code);
-            StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
+            string code  = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(HttpContext.Session.GetString("confirmationCode")));
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+            
+            StatusMessage = "Thank you for confirming your email.";
+            if (!result.Succeeded)
+            {
+                StatusMessage = "Error confirming your email.";
+                _logger.LogError(result.Errors.FirstOrDefault()?.ToString());    
+            }
             
             return Page();
         }

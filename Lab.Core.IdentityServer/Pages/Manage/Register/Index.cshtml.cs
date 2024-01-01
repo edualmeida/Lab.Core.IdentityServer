@@ -80,7 +80,7 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            Roles = new SelectList(_roleManager.Roles, "Name", "Name");
+            Roles = new SelectList(_roleManager.Roles, "NormalizedName", "Name");
             
             Input = new InputModel
             {
@@ -110,6 +110,7 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            var t = Input.SelectedRole;
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)

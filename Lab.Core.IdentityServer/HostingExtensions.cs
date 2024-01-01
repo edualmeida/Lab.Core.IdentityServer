@@ -23,7 +23,10 @@ internal static class HostingExtensions
         var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
 
         builder.Services.AddRazorPages();
-
+        builder.Services.AddSession(options => {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+        });
+        
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
 
@@ -89,7 +92,7 @@ internal static class HostingExtensions
         app.UseRouting();
         app.UseIdentityServer();
         app.UseAuthorization();
-        
+        app.UseSession();
         app.MapRazorPages()
             .RequireAuthorization();
 

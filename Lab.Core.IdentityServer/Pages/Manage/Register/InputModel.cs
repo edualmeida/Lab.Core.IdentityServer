@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Lab.Core.IdentityServer.Pages.Manage.Register;
 
@@ -15,7 +16,6 @@ public class InputModel
     [Display(Name = "Email")]
     public string Email { get; set; }
     
-    //[BindProperty]
     [Display(Name = "Role")]
     public string SelectedRole { get; set; }
 }
