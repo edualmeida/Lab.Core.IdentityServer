@@ -16,6 +16,7 @@
         <form id="change-password-form" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <input type="hidden" asp-for="Input.UserId" />
+            <input type="hidden" asp-for="Input.ReturnUrl" />
             @if(Model.FailedToConfirm){
                 <p class="text-info">
                     Failed to confirm account please contact support.
