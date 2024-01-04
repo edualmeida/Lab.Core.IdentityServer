@@ -15,7 +15,7 @@ using System.Linq;
 namespace Lab.Core.IdentityServer.Pages.Manage.UserList;
 
 [SecurityHeaders]
-[Authorize]
+[Authorize(Roles = RoleNames.AdminRole)]
 public class Index : PageModel
 {
     private readonly UserManager<ApplicationUser> _userManager;

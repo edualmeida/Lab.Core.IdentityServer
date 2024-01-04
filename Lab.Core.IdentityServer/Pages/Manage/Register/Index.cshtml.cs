@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -21,7 +22,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.CodeAnalysis.Differencing;
 using Microsoft.Extensions.Logging;
+using static Duende.IdentityServer.Models.IdentityResources;
 
 namespace Lab.Core.IdentityServer.Pages.Manage.Register
 {
@@ -78,16 +81,17 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
         
         public async Task<IActionResult> OnGetAsync(string returnUrl = null, string userId = null)
         {
+            IsEdit = !string.IsNullOrEmpty(userId);
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             Roles = new SelectList(_roleManager.Roles, "NormalizedName", "Name");
-            
             Input = new InputModel
             {
                 SelectedRole = _roleManager.Roles.FirstOrDefault()?.Name,
+                BirthDate = DateTime.Now
             };
             
-            if (!string.IsNullOrEmpty(userId))
+            if (IsEdit)
             {
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
@@ -96,12 +100,18 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
                 }
 
                 var roles = await _userManager.GetRolesAsync(user);
-
                 Input = new InputModel
                 {
                     Email = user.Email,
                     SelectedRole = roles.FirstOrDefault(),
-                    UserId = userId
+                    UserId = userId,
+                    FullName = user.UserName,
+                    BirthDate = user.BirthDate,
+                    Address1 = user.Address1,
+                    Address2 = user.Address2,
+                    City = user.City,
+                    PostalCode = user.PostalCode,
+                    County = user.County
                 };
             }
             
@@ -110,7 +120,6 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            var t = Input.SelectedRole;
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
@@ -124,12 +133,15 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
                     }
                     
                     SetUserFields(editUser);
-                    
-                    await _userStore.SetUserNameAsync(editUser, Input.Email, CancellationToken.None);
-                    await _emailStore.SetEmailAsync(editUser, Input.Email, CancellationToken.None);
-                    await _userManager.RemoveFromRolesAsync(editUser, _roleManager.Roles.ToList().Select(x=>x.Name));
-                    await _userManager.AddToRoleAsync(editUser, Input.SelectedRole);
-                    
+
+                    var resultEdit = await _userManager.UpdateAsync(editUser);
+
+                    if (resultEdit.Succeeded)
+                    {
+                        await _userManager.RemoveFromRolesAsync(editUser, _roleManager.Roles.ToList().Select(x => x.Name));
+                        await _userManager.AddToRoleAsync(editUser, Input.SelectedRole);
+                    }
+
                     StatusMessage = $"User email: '{Input.Email}', id: '{Input.UserId}' saved successfully";
                     return Page();
                 }

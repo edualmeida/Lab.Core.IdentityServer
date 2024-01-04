@@ -21,6 +21,7 @@ try
         .ConfigureServices()
         .ConfigurePipeline();
 
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     // this seeding is only for the template to bootstrap the DB and users.
     // in production you will likely want a different approach.
     if (args.Contains("/seed"))

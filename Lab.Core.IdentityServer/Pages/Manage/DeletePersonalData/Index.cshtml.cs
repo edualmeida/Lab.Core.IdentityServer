@@ -5,6 +5,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Lab.Core.IdentityServer.Configuration;
 using Lab.Core.IdentityServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lab.Core.IdentityServer.Pages.Manage.DeletePersonalData
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = RoleNames.AdminRole)]
     public class DeletePersonalDataModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
