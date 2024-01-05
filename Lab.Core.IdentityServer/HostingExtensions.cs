@@ -11,6 +11,8 @@ using System.Net;
 using System.Reflection;
 using Duende.IdentityServer.AspNetIdentity;
 using Microsoft.Extensions.DependencyInjection;
+using Lab.Core.IdentityServer.Configuration;
+using Lab.Core.IdentityServer.Services.Account;
 
 namespace Lab.Core.IdentityServer;
 
@@ -50,22 +52,23 @@ internal static class HostingExtensions
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
             })
-            //.AddInMemoryIdentityResources(Config.IdentityResources)
-            //.AddInMemoryApiScopes(Config.ApiScopes)
-            //.AddInMemoryClients(Config.Clients)
-            .AddConfigurationStore(options =>
-            {
-                options.ConfigureDbContext = b => b.UseNpgsql(connectionString,
-                    sql => sql.MigrationsAssembly(migrationsAssembly));
-            })
-            .AddOperationalStore(options =>
-            {
-                options.ConfigureDbContext = b => b.UseNpgsql(connectionString,
-                    sql => sql.MigrationsAssembly(migrationsAssembly));
-            })
+            .AddInMemoryIdentityResources(Config.IdentityResources)
+            .AddInMemoryApiScopes(Config.ApiScopes)
+            .AddInMemoryClients(Config.Clients)
+            //.AddConfigurationStore(options =>
+            //{
+            //    options.ConfigureDbContext = b => b.UseNpgsql(connectionString,
+            //        sql => sql.MigrationsAssembly(migrationsAssembly));
+            //})
+            //.AddOperationalStore(options =>
+            //{
+            //    options.ConfigureDbContext = b => b.UseNpgsql(connectionString,
+            //        sql => sql.MigrationsAssembly(migrationsAssembly));
+            //})
             .AddAspNetIdentity<ApplicationUser>()
-            .AddProfileService<ProfileService<ApplicationUser>>();
-        
+            //.AddProfileService<ProfileService<ApplicationUser>>();
+            .AddProfileService<CustomProfileService>();
+
         builder.Services.AddAuthentication()
             .AddGoogle(options =>
             {

@@ -51,6 +51,16 @@ public class InputModel
     
     [DataType(DataType.Text)]
     [StringLength(10)]
-    [Display(Name = "PostalCode")]
+    [Display(Name = "Postal Code")]
     public string PostalCode { get; set; }
+
+    [DataType(DataType.Text)]
+    [StringLength(50)]
+    [Display(Name = "Phone 1")]
+    public string Phone1 { get; set; }
+
+    [DataType(DataType.Text)]
+    [StringLength(50)]
+    [Display(Name = "Phone 2")]
+    public string Phone2 { get; set; }
 }

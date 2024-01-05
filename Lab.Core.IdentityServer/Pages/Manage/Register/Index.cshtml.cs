@@ -202,6 +202,8 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
             user.City = Input.City;
             user.County = Input.County;
             user.PostalCode = Input.PostalCode;
+            user.Phone1 = Input.Phone1;
+            user.Phone2 = Input.Phone2;
         }
 
         private ApplicationUser CreateUser()

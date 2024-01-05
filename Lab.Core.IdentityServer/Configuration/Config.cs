@@ -1,52 +1,89 @@
-﻿using Duende.IdentityServer.Models;
+﻿using Duende.IdentityServer;
+using Duende.IdentityServer.Models;
 
 namespace Lab.Core.IdentityServer.Configuration;
 
 public static class Config
 {
     public static IEnumerable<IdentityResource> IdentityResources =>
-        new IdentityResource[]
+        new List<IdentityResource>
         {
-            new IdentityResources.OpenId(),
-            new IdentityResources.Profile(),
+                new IdentityResources.OpenId(),
+                new IdentityResources.Profile(),
+                new IdentityResources.Email(),
         };
 
     public static IEnumerable<ApiScope> ApiScopes =>
-        new ApiScope[]
+        new List<ApiScope>
         {
-            new ApiScope("scope1"),
-            new ApiScope("scope2"),
+                new ApiScope("api1", "My API"),
+                new ApiScope("api2", "My API")
         };
 
     public static IEnumerable<Client> Clients =>
-        new Client[]
+    new List<Client>
+    {
+        new Client
         {
-            // m2m client credentials flow client
-            new Client
+            ClientId = "client",
+
+            // no interactive user, use the clientid/secret for authentication
+            AllowedGrantTypes = GrantTypes.ClientCredentials,
+
+            // secret for authentication
+            ClientSecrets =
             {
-                ClientId = "m2m.client",
-                ClientName = "Client Credentials Client",
-
-                AllowedGrantTypes = GrantTypes.ClientCredentials,
-                ClientSecrets = { new Secret("511536EF-F270-4058-80CA-1C89C192F69A".Sha256()) },
-
-                AllowedScopes = { "scope1" }
+                new Secret("secret".Sha256())
             },
 
-            // interactive client using code flow + pkce
-            new Client
+            // scopes that client has access to
+            AllowedScopes = { "api1", "api2" }
+        },
+        // interactive ASP.NET Core MVC client
+        new Client
+        {
+            ClientName = "mvc",
+            ClientId = "mvc",
+            ClientSecrets = { new Secret("secret".Sha256()) },
+
+            AllowedGrantTypes = GrantTypes.Code,
+
+            // where to redirect to after login
+            RedirectUris = { "https://localhost:5002/signin-oidc" },
+
+            // where to redirect to after logout
+            PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" },
+            AllowOfflineAccess = true,
+            AlwaysSendClientClaims = true,
+            AlwaysIncludeUserClaimsInIdToken = true,
+            UpdateAccessTokenClaimsOnRefresh = true,
+            
+            AllowedScopes = new List<string>
             {
-                ClientId = "interactive",
-                ClientSecrets = { new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
+                IdentityServerConstants.StandardScopes.OpenId,
+                IdentityServerConstants.StandardScopes.Profile,
+                IdentityServerConstants.StandardScopes.Email,
+                IdentityServerConstants.StandardScopes.OfflineAccess,
+                "api1"
+            }
+        },
+        new Client
+        {
+            ClientId = "js",
+            ClientName = "JavaScript Client",
+            AllowedGrantTypes = GrantTypes.Code,
+            RequireClientSecret = false,
 
-                AllowedGrantTypes = GrantTypes.Code,
+            RedirectUris =           { "https://localhost:5003/callback.html" },
+            PostLogoutRedirectUris = { "https://localhost:5003/index.html" },
+            AllowedCorsOrigins =     { "https://localhost:5003" },
 
-                RedirectUris = { "https://localhost:44300/signin-oidc" },
-                FrontChannelLogoutUri = "https://localhost:44300/signout-oidc",
-                PostLogoutRedirectUris = { "https://localhost:44300/signout-callback-oidc" },
-
-                AllowOfflineAccess = true,
-                AllowedScopes = { "openid", "profile", "scope2" }
-            },
-        };
+            AllowedScopes =
+            {
+                IdentityServerConstants.StandardScopes.OpenId,
+                IdentityServerConstants.StandardScopes.Profile,
+                "api1"
+            }
+        }
+    };
 }

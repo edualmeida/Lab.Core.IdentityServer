@@ -3,18 +3,20 @@ using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Lab.Core.IdentityServer.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace Lab.Core.IdentityServer.Services.Account;
 
-public class ProfileService : IProfileService
+public class CustomProfileService : IProfileService
 {
     private readonly IUserClaimsPrincipalFactory<ApplicationUser> _claimsFactory;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ILogger<ProfileService> Logger;
+    private readonly ILogger<CustomProfileService> Logger;
     
-    public ProfileService(UserManager<ApplicationUser> userManager,
+    public CustomProfileService(UserManager<ApplicationUser> userManager,
         IUserClaimsPrincipalFactory<ApplicationUser> claimsFactory,
-        ILogger<ProfileService> logger)
+        ILogger<CustomProfileService> logger)
     {
         _userManager = userManager;
         _claimsFactory = claimsFactory;
@@ -36,8 +38,21 @@ public class ProfileService : IProfileService
             var principal = await _claimsFactory.CreateAsync(user);
             if (principal == null) throw new Exception("ClaimsFactory failed to create a principal");
             context.IssuedClaims.AddRange(principal.Claims);
+
+            var customClaims = new List<Claim>
+            {
+                new Claim("FullName", user.FullName),
+                new Claim("Address1", user.Address1),
+                new Claim("Address2", user.Address2),
+                new Claim("Address2", user.Address2),
+                new Claim("Address2", user.Address2),
+                new Claim("Address2", user.Address2),
+                new Claim("Address2", user.Address2),
+                new Claim("Address2", user.Address2),
+            };
+
+            context.IssuedClaims.AddRange(customClaims);
         }
-                
     }
     
     public async Task IsActiveAsync(IsActiveContext context)

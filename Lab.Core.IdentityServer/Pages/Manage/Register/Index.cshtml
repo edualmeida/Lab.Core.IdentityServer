@@ -56,7 +56,12 @@
                 <label asp-for="Input.PostalCode">EIR Code</label>
                 <input asp-for="Input.PostalCode" class="form-control" autocomplete="postalcode" placeholder="EIR Code"/>
                 <span asp-validation-for="Input.PostalCode" class="text-danger"></span>
-            </div>            
+            </div>
+            <div class="form-floating mb-3">
+                <label asp-for="Input.Phone1">Phone</label>
+                <input asp-for="Input.Phone1" class="form-control" autocomplete="phone" placeholder="Phone" />
+                <span asp-validation-for="Input.Phone1" class="text-danger"></span>
+            </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">@btnName</button>
         </form>
     </div>
