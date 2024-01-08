@@ -6,11 +6,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="12.0.1" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="Duende.IdentityServer" Version="6.3.7" />
 		<PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.3.2" />
 		<PackageReference Include="Duende.IdentityServer.EntityFramework" Version="6.3.7" />
 
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.0" />
+
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
 
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
 		  <PrivateAssets>all</PrivateAssets>
@@ -27,6 +31,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 	</ItemGroup>
 

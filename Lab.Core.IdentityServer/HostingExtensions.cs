@@ -13,6 +13,8 @@ using Duende.IdentityServer.AspNetIdentity;
 using Microsoft.Extensions.DependencyInjection;
 using Lab.Core.IdentityServer.Configuration;
 using Lab.Core.IdentityServer.Services.Account;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Lab.Core.IdentityServer;
 
@@ -22,9 +24,21 @@ internal static class HostingExtensions
     {
         AddInfrastructure(builder);
 
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = "https://localhost:5001";
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false
+                };
+            });
+
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
 
+        builder.Services.AddAutoMapper(typeof(Program));
         builder.Services.AddRazorPages();
         builder.Services.AddSession(options => {
             options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -69,17 +83,17 @@ internal static class HostingExtensions
             //.AddProfileService<ProfileService<ApplicationUser>>();
             .AddProfileService<CustomProfileService>();
 
-        builder.Services.AddAuthentication()
-            .AddGoogle(options =>
-            {
-                options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+        //builder.Services.AddAuthentication()
+        //    .AddGoogle(options =>
+        //    {
+        //        options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
 
-                // register your IdentityServer with Google at https://console.developers.google.com
-                // enable the Google+ API
-                // set the redirect URI to https://localhost:5001/signin-google
-                options.ClientId = "copy client ID from Google here";
-                options.ClientSecret = "copy client secret from Google here";
-            });
+        //        // register your IdentityServer with Google at https://console.developers.google.com
+        //        // enable the Google+ API
+        //        // set the redirect URI to https://localhost:5001/signin-google
+        //        options.ClientId = "copy client ID from Google here";
+        //        options.ClientSecret = "copy client secret from Google here";
+        //    });
 
         return builder.Build();
     }
@@ -96,7 +110,9 @@ internal static class HostingExtensions
         app.UseStaticFiles();
         app.UseRouting();
         app.UseIdentityServer();
+        app.UseHttpsRedirection();
         app.UseAuthorization();
+        app.MapControllers();
         app.UseSession();
         app.MapRazorPages()
             .RequireAuthorization();

@@ -41,14 +41,15 @@ public class CustomProfileService : IProfileService
 
             var customClaims = new List<Claim>
             {
-                new Claim("FullName", user.FullName),
-                new Claim("Address1", user.Address1),
-                new Claim("Address2", user.Address2),
-                new Claim("Address2", user.Address2),
-                new Claim("Address2", user.Address2),
-                new Claim("Address2", user.Address2),
-                new Claim("Address2", user.Address2),
-                new Claim("Address2", user.Address2),
+                new Claim("FullName", user.FullName ?? ""),
+                new Claim("BirthDate", user.BirthDate.ToString("dd-MM-yyyy")),
+                new Claim("Address1", user.Address1 ?? ""),
+                new Claim("Address2", user.Address2 ?? ""),
+                new Claim("City", user.City ?? ""),
+                new Claim("County", user.County ?? ""),
+                new Claim("PostalCode", user.PostalCode ?? ""),
+                new Claim("Phone1", user.Phone1 ?? ""),
+                new Claim("Phone2", user.Phone2 ?? ""),
             };
 
             context.IssuedClaims.AddRange(customClaims);

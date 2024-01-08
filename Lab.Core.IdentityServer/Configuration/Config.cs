@@ -16,8 +16,8 @@ public static class Config
     public static IEnumerable<ApiScope> ApiScopes =>
         new List<ApiScope>
         {
-                new ApiScope("api1", "My API"),
-                new ApiScope("api2", "My API")
+                new ApiScope("userProfile", "Support API for the Identity services"),
+                new ApiScope("api1", "api1 test"),
         };
 
     public static IEnumerable<Client> Clients =>
@@ -25,7 +25,7 @@ public static class Config
     {
         new Client
         {
-            ClientId = "client",
+            ClientId = "identityApi",
 
             // no interactive user, use the clientid/secret for authentication
             AllowedGrantTypes = GrantTypes.ClientCredentials,
@@ -37,7 +37,7 @@ public static class Config
             },
 
             // scopes that client has access to
-            AllowedScopes = { "api1", "api2" }
+            AllowedScopes = { "userProfile" }
         },
         // interactive ASP.NET Core MVC client
         new Client
