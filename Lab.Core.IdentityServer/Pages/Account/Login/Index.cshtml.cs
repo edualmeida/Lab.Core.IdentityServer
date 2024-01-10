@@ -45,6 +45,8 @@ public class Index : PageModel
         
     public async Task<IActionResult> OnGet(string returnUrl)
     {
+        ViewData["hide-main-menu"] = true;
+
         await BuildModelAsync(returnUrl);
             
         if (View.IsExternalLoginOnly)

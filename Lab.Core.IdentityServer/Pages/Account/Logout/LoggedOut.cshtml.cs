@@ -19,6 +19,8 @@ public class LoggedOut : PageModel
 
     public async Task OnGet(string logoutId)
     {
+        ViewData["hide-main-menu"] = true;
+
         // get context information (client name, post logout redirect URI and iframe for federated signout)
         var logout = await _interactionService.GetLogoutContextAsync(logoutId);
 

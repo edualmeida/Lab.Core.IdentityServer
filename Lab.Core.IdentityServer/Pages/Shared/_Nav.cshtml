@@ -5,32 +5,37 @@
     {
         name = Context.User?.GetDisplayName();
     }
+
+    var hideMenu = true.Equals(ViewData["hide-main-menu"]);
 }
 
-<div class="nav-page">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+@if (!hideMenu)
+{
+    <div class="nav-page">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
-        <a href="~/" class="navbar-brand">
-            <img src="~/duende-logo.svg" class="icon-banner">
-            IdentityServer
-        </a>
+            <a href="~/" class="navbar-brand">
+                <img src="~/duende-logo.svg" class="icon-banner">
+                IdentityServer
+            </a>
 
-        @if (!string.IsNullOrWhiteSpace(name))
-        {
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">@name <b class="caret"></b></a>
-                    
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" asp-page="/Account/Logout/Index">Logout</a>
-                        <a class="dropdown-item" asp-page="/Account/ChangePassword/Index">Change Password</a>
-                        <a class="dropdown-item" asp-page="/Manage/Register/Index">Register new account</a>
-                        <a class="dropdown-item" asp-page="/Manage/DeletePersonalData/Index">Delete User</a>
-                        <a class="dropdown-item" asp-page="/Manage/UserList/Index">Users List</a>
-                    </div>
-                </li>
-            </ul>
-        }
-    
-    </nav>
-</div>
+            @if (!string.IsNullOrWhiteSpace(name))
+            {
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">@name <b class="caret"></b></a>
+
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" asp-page="/Account/Logout/Index">Logout</a>
+                            <a class="dropdown-item" asp-page="/Account/ChangePassword/Index">Change Password</a>
+                            <a class="dropdown-item" asp-page="/Manage/Register/Index">Register new account</a>
+                            <a class="dropdown-item" asp-page="/Manage/DeletePersonalData/Index">Delete User</a>
+                            <a class="dropdown-item" asp-page="/Manage/UserList/Index">Users List</a>
+                        </div>
+                    </li>
+                </ul>
+            }
+
+        </nav>
+    </div>
+}

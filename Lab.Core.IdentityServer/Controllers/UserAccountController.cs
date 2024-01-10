@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Lab.Core.IdentityServer.Controllers
 {
@@ -28,8 +29,8 @@ namespace Lab.Core.IdentityServer.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("{userId}")]
-        public async Task<IActionResult> Post([FromRoute] string userId, [FromBody] ChangePassword changePassword)
+        [HttpPost("changepassword/{userId}")]
+        public async Task<IActionResult> ChangePassword([FromRoute] string userId, [FromBody] ChangePassword changePassword)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
