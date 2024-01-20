@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Register";
     var btnName = Model.IsEdit ? "Register" : "Save";
-    var readonlyTag = Model.IsEdit ? "readonly" : null;
+    var readonlyTag = Model.IsEdit ? null : "readonly";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -18,7 +18,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
             <div class="form-floating mb-3">
                 <label asp-for="Input.Email">Email</label>
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" readonly="@(Model.IsEdit)" />
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" readonly="@(readonlyTag)" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
