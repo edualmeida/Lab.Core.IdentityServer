@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Lab.Core.IdentityServer.Models;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 
 namespace Lab.Core.IdentityServer.Data;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataProtectionKeyContext
 {
+    DbSet<DataProtectionKey> IDataProtectionKeyContext.DataProtectionKeys { get { return DataProtectionKeys; } }
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
