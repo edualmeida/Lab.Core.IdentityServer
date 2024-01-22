@@ -18,7 +18,7 @@ var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCr
 
     ClientId = "identityApi",
     ClientSecret = "secret",
-    Scope = "userProfile"
+    Scope = "accountManager"
 });
 
 if (tokenResponse.IsError)

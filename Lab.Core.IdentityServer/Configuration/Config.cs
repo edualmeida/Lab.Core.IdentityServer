@@ -16,8 +16,8 @@ public static class Config
     public static IEnumerable<ApiScope> ApiScopes =>
         new List<ApiScope>
         {
-                new ApiScope("userProfile", "Support API for the Identity services"),
-                new ApiScope("api1", "api1 test"),
+                new ApiScope(AppConstants.IdentityResource_AccountManager, "Support API for the identity services account controller"),
+                new ApiScope("api1", "api test"),
         };
 
     public static IEnumerable<Client> Clients =>
@@ -25,7 +25,7 @@ public static class Config
     {
         new Client
         {
-            ClientId = "identityApi",
+            ClientId = AppConstants.Client_ClientId_IdentityApi,
 
             // no interactive user, use the clientid/secret for authentication
             AllowedGrantTypes = GrantTypes.ClientCredentials,
@@ -33,18 +33,18 @@ public static class Config
             // secret for authentication
             ClientSecrets =
             {
-                new Secret("secret".Sha256())
+                new Secret("DJ%?s$,@S!xEQmt7V_p&6Z".Sha256())
             },
 
             // scopes that client has access to
-            AllowedScopes = { "userProfile" }
+            AllowedScopes = { AppConstants.IdentityResource_AccountManager }
         },
         // interactive ASP.NET Core MVC client
         new Client
         {
-            ClientName = "mvc",
-            ClientId = "mvc",
-            ClientSecrets = { new Secret("secret".Sha256()) },
+            ClientName = AppConstants.Client_ClientId_LabGymWeb,
+            ClientId = AppConstants.Client_ClientId_LabGymWeb,
+            ClientSecrets = { new Secret("J2-6zNR/pLf5k>wAK&.B%$".Sha256()) },
 
             AllowedGrantTypes = GrantTypes.Code,
 
