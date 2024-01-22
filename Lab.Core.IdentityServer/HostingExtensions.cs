@@ -48,12 +48,20 @@ internal static class HostingExtensions
             options.UseNpgsql(connectionString));
 
         builder.Services
-            .AddIdentity<ApplicationUser, IdentityRole>(options => 
-                options.SignIn.RequireConfirmedAccount = true
-            )
+            .AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+            })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+
+        // configure the application cookie
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.SameSite = SameSiteMode.None;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
 
         builder.Services
             .AddIdentityServer(options =>
@@ -65,7 +73,6 @@ internal static class HostingExtensions
 
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
-                options.Authentication.CookieSameSiteMode = SameSiteMode.Strict;
             })
             .AddInMemoryIdentityResources(Config.IdentityResources)
             .AddInMemoryApiScopes(Config.ApiScopes)
