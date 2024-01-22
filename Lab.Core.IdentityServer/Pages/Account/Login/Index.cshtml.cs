@@ -121,7 +121,7 @@ public class Index : PageModel
                     return Redirect("~/");
                 }
                 else
-                {
+                    {
                     // user might have clicked on a malicious link - should be logged
                     throw new Exception("invalid return URL");
                 }

@@ -1,5 +1,6 @@
 using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Lab.Core.IdentityServer.Pages.Logout;
@@ -17,12 +18,17 @@ public class LoggedOut : PageModel
         _interactionService = interactionService;
     }
 
-    public async Task OnGet(string logoutId)
+    public async Task<IActionResult> OnGet(string logoutId)
     {
         ViewData["hide-main-menu"] = true;
 
         // get context information (client name, post logout redirect URI and iframe for federated signout)
         var logout = await _interactionService.GetLogoutContextAsync(logoutId);
+
+        if(logoutId == null)
+        {
+            return RedirectToPage("/Account/Login/Index");
+        }
 
         View = new LoggedOutViewModel
         {
@@ -31,5 +37,7 @@ public class LoggedOut : PageModel
             ClientName = String.IsNullOrEmpty(logout?.ClientName) ? logout?.ClientId : logout?.ClientName,
             SignOutIframeUrl = logout?.SignOutIFrameUrl
         };
+
+        return Page();
     }
 }
