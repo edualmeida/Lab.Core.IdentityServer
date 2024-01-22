@@ -21,6 +21,6 @@ RUN dotnet publish "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o
 
 FROM base AS final
 WORKDIR /app
-ADD /keys /keys
+RUN mkdir -p /var/app/keys
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Lab.Core.IdentityServer.dll"]
