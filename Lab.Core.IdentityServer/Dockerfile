@@ -1,7 +1,5 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-RUN mkdir -p /app/keys
-
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
@@ -20,6 +18,7 @@ RUN dotnet build "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN mkdir -p /app/keys
 
 FROM base AS final
 WORKDIR /app
