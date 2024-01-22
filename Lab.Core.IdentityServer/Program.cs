@@ -1,6 +1,8 @@
 ﻿using Lab.Core.IdentityServer;
 using Lab.Core.IdentityServer.Data.Initialization;
+using Microsoft.AspNetCore.DataProtection;
 using Serilog;
+using System.Runtime.InteropServices;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -15,6 +17,12 @@ try
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+
+    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    {
+        builder.Services.AddDataProtection()
+            .PersistKeysToFileSystem(new System.IO.DirectoryInfo(@"/var/core-identityserver/"));
+    }
 
     builder.Host.UseSerilog((ctx, lc) => lc
         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
