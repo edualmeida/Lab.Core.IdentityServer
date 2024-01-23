@@ -7,7 +7,7 @@ EXPOSE 8080
 EXPOSE 8081
 
 WORKDIR /app
-RUN chmod a+rwx /app/keys
+RUN chmod a+rwx /keys
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
