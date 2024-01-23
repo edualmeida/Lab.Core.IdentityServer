@@ -24,5 +24,5 @@ RUN dotnet publish "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN sudo chmod a+rwx /app/keys
+RUN chmod a+rwx /app/keys
 ENTRYPOINT ["dotnet", "Lab.Core.IdentityServer.dll"]
