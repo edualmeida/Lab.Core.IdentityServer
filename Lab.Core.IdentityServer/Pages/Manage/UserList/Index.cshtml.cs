@@ -26,6 +26,8 @@ public class Index : PageModel
         _userManager = userManager;
     }
 
+    [TempData]
+    public string StatusMessage { get; set; }
     public ViewModel View { get; set; }
     public string NameSort { get; set; }
     public string CurrentFilter { get; set; }

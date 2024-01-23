@@ -1,30 +1,14 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Lab.Core.IdentityServer.Configuration;
 using Lab.Core.IdentityServer.Models;
 using Lab.Core.IdentityServer.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.CodeAnalysis.Differencing;
-using Microsoft.Extensions.Logging;
-using static Duende.IdentityServer.Models.IdentityResources;
 
 namespace Lab.Core.IdentityServer.Pages.Manage.Register
 {
@@ -58,39 +42,18 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
 
         [TempData]
         public string StatusMessage { get; set; }
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public IList<AuthenticationScheme> ExternalLogins { get; set; }        
         public SelectList Roles { get; set; }
+        [BindProperty]
         public bool IsEdit { get; set; }
-        
+
         public async Task<IActionResult> OnGetAsync(string returnUrl = null, string userId = null)
         {
-            IsEdit = !string.IsNullOrEmpty(userId);
             ReturnUrl = returnUrl;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            Roles = new SelectList(_roleManager.Roles, "NormalizedName", "Name");
-            Input = new InputModel
-            {
-                SelectedRole = _roleManager.Roles.FirstOrDefault()?.Name,
-                BirthDate = DateTime.Now
-            };
-            
+            IsEdit = !string.IsNullOrEmpty(userId);
+            SetInputForView(false, null, _roleManager.Roles.FirstOrDefault()?.Name);
             if (IsEdit)
             {
                 var user = await _userManager.FindByIdAsync(userId);
@@ -99,98 +62,117 @@ namespace Lab.Core.IdentityServer.Pages.Manage.Register
                     return NotFound($"Unable to load user with ID '{userId}'.");
                 }
 
-                var roles = await _userManager.GetRolesAsync(user);
-                Input = new InputModel
-                {
-                    Email = user.Email,
-                    SelectedRole = roles.FirstOrDefault(),
-                    UserId = userId,
-                    FullName = user.UserName,
-                    BirthDate = user.BirthDate,
-                    Address1 = user.Address1,
-                    Address2 = user.Address2,
-                    City = user.City,
-                    PostalCode = user.PostalCode,
-                    County = user.County
-                };
+                SetInputForView(IsEdit, user, (await _userManager.GetRolesAsync(user)).FirstOrDefault());
             }
-            
+
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            IdentityResult result = null;
+
             if (ModelState.IsValid)
             {
-                if (!string.IsNullOrEmpty(Input.UserId))
+                if (IsEdit)
                 {
                     var editUser = await _userManager.FindByIdAsync(Input.UserId);
                     if (editUser == null)
                     {
                         return NotFound($"Unable to load user with ID '{Input.UserId}'.");
                     }
-                    
+
                     SetUserFields(editUser);
 
-                    var resultEdit = await _userManager.UpdateAsync(editUser);
-
-                    if (resultEdit.Succeeded)
+                    result = await _userManager.UpdateAsync(editUser);
+                    if (result.Succeeded)
                     {
                         await _userManager.RemoveFromRolesAsync(editUser, _roleManager.Roles.ToList().Select(x => x.Name));
                         await _userManager.AddToRoleAsync(editUser, Input.SelectedRole);
+
+                        StatusMessage = $"User saved successfully";
+                        SetInputForView(IsEdit, editUser, Input.SelectedRole);
+                        return Page();
                     }
-
-                    StatusMessage = $"User email: '{Input.Email}', id: '{Input.UserId}' saved successfully";
-                    return Page();
                 }
-                
-                var user = CreateUser();
-
-                SetUserFields(user);
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user);
-                
-                if (result.Succeeded)
+                else
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    var user = CreateUser();
 
-                    await _userManager.AddToRoleAsync(user, Input.SelectedRole);
-                    
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var confirmationCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    confirmationCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationCode));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail/Index",
-                        pageHandler: null,
-                        values: new { userId, code = confirmationCode, returnUrl },
-                        protocol: Request.Scheme);
+                    SetUserFields(user);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                    result = await _userManager.CreateAsync(user);
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    if (result.Succeeded)
                     {
+                        _logger.LogInformation("User created a new account with password.");
+
+                        await _userManager.AddToRoleAsync(user, Input.SelectedRole);
+
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var confirmationCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        confirmationCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationCode));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail/Index",
+                            pageHandler: null,
+                            values: new { userId, code = confirmationCode, returnUrl },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
                         StatusMessage = $"User email: '{Input.Email}', id: '{userId}' registered successfully";
-                        return LocalRedirect(returnUrl);
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        return LocalRedirect("/Manage/UserList/Index");
                     }
                 }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+
+                SetResultErrors(result);
             }
 
             // If we got this far, something failed, redisplay form
             return Page();
+        }
+
+        private void SetResultErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
+
+        private void SetInputForView(bool isEdit, ApplicationUser user, string role)
+        {
+            Roles = new SelectList(_roleManager.Roles, "NormalizedName", "Name");
+            if (isEdit)
+            {
+                Input = new InputModel
+                {
+                    Email = user.Email,
+                    SelectedRole = role,
+                    UserId = user.Id,
+                    FullName = user.UserName,
+                    BirthDate = user.BirthDate,
+                    Address1 = user.Address1,
+                    Address2 = user.Address2,
+                    City = user.City,
+                    PostalCode = user.PostalCode,
+                    County = user.County,
+                    Phone1 = user.Phone1,
+                    Phone2 = user.Phone2,
+                };
+            }
+            else
+            {
+                Input = new InputModel
+                {
+                    SelectedRole = _roleManager.Roles.FirstOrDefault()?.Name,
+                    BirthDate = DateTime.Now
+                };
+            }
         }
 
         private void SetUserFields(ApplicationUser user)
