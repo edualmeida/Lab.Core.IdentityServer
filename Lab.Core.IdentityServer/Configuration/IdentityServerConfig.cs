@@ -3,7 +3,7 @@ using Duende.IdentityServer.Models;
 
 namespace Lab.Core.IdentityServer.Configuration;
 
-public static class Config
+public static class IdentityServerConfig
 {
     public static IEnumerable<IdentityResource> IdentityResources =>
         new List<IdentityResource>
@@ -49,10 +49,10 @@ public static class Config
             AllowedGrantTypes = GrantTypes.Code,
 
             // where to redirect to after login
-            RedirectUris = { "https://localhost:5002/signin-oidc" },
+            RedirectUris = { "https://web-gym:5002/signin-oidc" },
 
             // where to redirect to after logout
-            PostLogoutRedirectUris = { "https://localhost:5002/signout-callback-oidc" },
+            PostLogoutRedirectUris = { "https://web-gym:5002/signout-callback-oidc" },
             AllowOfflineAccess = true,
             AlwaysSendClientClaims = true,
             AlwaysIncludeUserClaimsInIdToken = true,

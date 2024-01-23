@@ -1,16 +1,10 @@
-using Duende.IdentityServer;
 using Lab.Core.IdentityServer.Data;
 using Lab.Core.IdentityServer.Models;
 using Lab.Core.IdentityServer.Services;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System.Net.Mail;
-using System.Net;
 using System.Reflection;
-using Duende.IdentityServer.AspNetIdentity;
-using Microsoft.Extensions.DependencyInjection;
 using Lab.Core.IdentityServer.Configuration;
 using Lab.Core.IdentityServer.Services.Account;
 using Microsoft.IdentityModel.Tokens;
@@ -27,8 +21,7 @@ internal static class HostingExtensions
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = "https://localhost:5001";
-
+                options.Authority = "https://localhost:5001"; // it self
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateAudience = false
@@ -74,9 +67,9 @@ internal static class HostingExtensions
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
             })
-            .AddInMemoryIdentityResources(Config.IdentityResources)
-            .AddInMemoryApiScopes(Config.ApiScopes)
-            .AddInMemoryClients(Config.Clients)
+            .AddInMemoryIdentityResources(IdentityServerConfig.IdentityResources)
+            .AddInMemoryApiScopes(IdentityServerConfig.ApiScopes)
+            .AddInMemoryClients(IdentityServerConfig.Clients)
             //.AddConfigurationStore(options =>
             //{
             //    options.ConfigureDbContext = b => b.UseNpgsql(connectionString,
