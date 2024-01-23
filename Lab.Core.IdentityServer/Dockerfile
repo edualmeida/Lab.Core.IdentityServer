@@ -13,7 +13,6 @@ COPY ["Lab.Core.IdentityServer/Lab.Core.IdentityServer.csproj", "Lab.Core.Identi
 RUN dotnet restore "./Lab.Core.IdentityServer/./Lab.Core.IdentityServer.csproj"
 COPY . .
 WORKDIR "/src/Lab.Core.IdentityServer"
-RUN chmod a+rwx /keys
 RUN dotnet build "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 #RUN dotnet test "./test/AspNetCoreInDocker.Web.Tests/AspNetCoreInDocker.Web.Tests.csproj" -c Release --no-build --no-restore
@@ -25,4 +24,7 @@ RUN dotnet publish "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+USER root
+RUN chmod a+rwx /app/keys
+USER app
 ENTRYPOINT ["dotnet", "Lab.Core.IdentityServer.dll"]
