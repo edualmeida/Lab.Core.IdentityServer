@@ -6,9 +6,6 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-WORKDIR /app
-RUN chmod a+rwx /keys
-
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
@@ -16,6 +13,7 @@ COPY ["Lab.Core.IdentityServer/Lab.Core.IdentityServer.csproj", "Lab.Core.Identi
 RUN dotnet restore "./Lab.Core.IdentityServer/./Lab.Core.IdentityServer.csproj"
 COPY . .
 WORKDIR "/src/Lab.Core.IdentityServer"
+RUN chmod a+rwx /keys
 RUN dotnet build "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 #RUN dotnet test "./test/AspNetCoreInDocker.Web.Tests/AspNetCoreInDocker.Web.Tests.csproj" -c Release --no-build --no-restore
