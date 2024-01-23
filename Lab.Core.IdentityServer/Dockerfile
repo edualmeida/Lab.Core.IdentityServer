@@ -26,5 +26,6 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 USER root
 RUN chmod a+rwx /app/keys
+RUN rm /app/keys/*.json
 USER app
 ENTRYPOINT ["dotnet", "Lab.Core.IdentityServer.dll"]
