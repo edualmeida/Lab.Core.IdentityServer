@@ -15,6 +15,8 @@ COPY . .
 WORKDIR "/src/Lab.Core.IdentityServer"
 RUN dotnet build "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+#RUN dotnet test "./test/AspNetCoreInDocker.Web.Tests/AspNetCoreInDocker.Web.Tests.csproj" -c Release --no-build --no-restore
+
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
@@ -22,5 +24,5 @@ RUN dotnet publish "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN mkdir -p -m 755 /app/keys
+RUN mkdir -m 755 /app/keys
 ENTRYPOINT ["dotnet", "Lab.Core.IdentityServer.dll"]
