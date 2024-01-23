@@ -18,9 +18,9 @@ RUN dotnet build "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Lab.Core.IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-RUN mkdir -p -m 777 /app/keys
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+RUN mkdir -p -m 755 /app/keys
 ENTRYPOINT ["dotnet", "Lab.Core.IdentityServer.dll"]
