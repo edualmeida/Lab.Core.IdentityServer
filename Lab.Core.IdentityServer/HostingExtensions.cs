@@ -10,6 +10,7 @@ using Lab.Core.IdentityServer.Services.Account;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Lab.Core.IdentityServer;
 
@@ -110,6 +111,18 @@ internal static class HostingExtensions
         {
             app.UseDeveloperExceptionPage();
         }
+
+        var forwardOptions = new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+            RequireHeaderSymmetry = false
+        };
+
+        forwardOptions.KnownNetworks.Clear();
+        forwardOptions.KnownProxies.Clear();
+
+        // ref: https://github.com/aspnet/Docs/issues/2384
+        app.UseForwardedHeaders(forwardOptions);
 
         app.UseStaticFiles();
         app.UseRouting();
