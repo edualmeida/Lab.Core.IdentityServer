@@ -1,9 +1,6 @@
 ﻿using Lab.Core.IdentityServer;
-using Lab.Core.IdentityServer.Data;
 using Lab.Core.IdentityServer.Data.Initialization;
-using Microsoft.AspNetCore.DataProtection;
 using Serilog;
-using System.Runtime.InteropServices;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -19,14 +16,6 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
-    //if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-    //{
-    //    builder.Services.AddDataProtection()
-    //        .PersistKeysToFileSystem(new System.IO.DirectoryInfo(@"/var/core-identityserver/"));
-    //}
-
-    builder.Services.AddDataProtection().PersistKeysToDbContext<ApplicationDbContext>();
-
     builder.Host.UseSerilog((ctx, lc) => lc
         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}")
         .Enrich.FromLogContext()
@@ -37,8 +26,7 @@ try
         .ConfigurePipeline();
 
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-    // this seeding is only for the template to bootstrap the DB and users.
-    // in production you will likely want a different approach.
+
     if (args.Contains("/seed"))
     {
         Log.Information("Seeding database...");

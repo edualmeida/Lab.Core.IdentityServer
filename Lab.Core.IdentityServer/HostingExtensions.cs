@@ -9,6 +9,7 @@ using Lab.Core.IdentityServer.Configuration;
 using Lab.Core.IdentityServer.Services.Account;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace Lab.Core.IdentityServer;
 
@@ -18,10 +19,12 @@ internal static class HostingExtensions
     {
         AddInfrastructure(builder);
 
+        builder.Services.AddDataProtection().PersistKeysToDbContext<ApplicationDbContext>();
+
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = "https://localhost:5001"; // it self
+                options.Authority = builder.Configuration["Jwt:Authority"];
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateAudience = false
@@ -69,7 +72,7 @@ internal static class HostingExtensions
             })
             .AddInMemoryIdentityResources(IdentityServerConfig.IdentityResources)
             .AddInMemoryApiScopes(IdentityServerConfig.ApiScopes)
-            .AddInMemoryClients(IdentityServerConfig.Clients)
+            .AddInMemoryClients(IdentityServerConfig.Clients(builder.Configuration))
             //.AddConfigurationStore(options =>
             //{
             //    options.ConfigureDbContext = b => b.UseNpgsql(connectionString,

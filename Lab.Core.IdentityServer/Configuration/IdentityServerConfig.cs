@@ -20,7 +20,7 @@ public static class IdentityServerConfig
                 new ApiScope("api1", "api test"),
         };
 
-    public static IEnumerable<Client> Clients =>
+    public static IEnumerable<Client> Clients (IConfiguration configuration) =>
     new List<Client>
     {
         new Client
@@ -47,12 +47,10 @@ public static class IdentityServerConfig
             ClientSecrets = { new Secret("J2-6zNR/pLf5k>wAK&.B%$".Sha256()) },
 
             AllowedGrantTypes = GrantTypes.Code,
+            
+            RedirectUris = { configuration["Ids.Clients:LabGymWeb:RedirectUris"] }, // where to redirect to after login
 
-            // where to redirect to after login
-            RedirectUris = { "https://web-gym:5002/signin-oidc" },
-
-            // where to redirect to after logout
-            PostLogoutRedirectUris = { "https://web-gym:5002/signout-callback-oidc" },
+            PostLogoutRedirectUris = { configuration["Ids.Clients:LabGymWeb:PostLogoutRedirectUris"] }, // where to redirect to after logout
             AllowOfflineAccess = true,
             AlwaysSendClientClaims = true,
             AlwaysIncludeUserClaimsInIdToken = true,
