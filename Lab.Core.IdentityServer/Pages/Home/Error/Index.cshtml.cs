@@ -32,7 +32,7 @@ public class Index : PageModel
             if (!_environment.IsDevelopment())
             {
                 // only show in development
-                message.ErrorDescription = null;
+                //message.ErrorDescription = null;
             }
         }
     }

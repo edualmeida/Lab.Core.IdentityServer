@@ -23,6 +23,21 @@
                     {
                         <div>@Model.View.Error.ErrorDescription</div>
                     }
+
+                    if (Model.View.Error.ClientId != null)
+                    {
+                        <div>@Model.View.Error.ClientId</div>
+                    }
+
+                    if (Model.View.Error.RedirectUri != null)
+                    {
+                        <div>@Model.View.Error.RedirectUri</div>
+                    }
+
+                    if (Model.View.Error.ResponseMode != null)
+                    {
+                        <div>@Model.View.Error.ResponseMode</div>
+                    }
                 }
             </div>
 
