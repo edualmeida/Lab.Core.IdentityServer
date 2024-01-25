@@ -11,6 +11,8 @@ Log.Information("Starting up");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    
+    builder.Host.ConfigureAppSettings();
 
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();

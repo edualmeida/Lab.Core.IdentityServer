@@ -16,6 +16,21 @@ namespace Lab.Core.IdentityServer;
 
 internal static class HostingExtensions
 {
+    public static IHostBuilder ConfigureAppSettings(this IHostBuilder host)
+    {
+        var enviroment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        Log.Information($"ASPNETCORE_ENVIRONMENT: {enviroment}");
+        host.ConfigureAppConfiguration((ctx, builder) =>
+        {
+            builder.AddJsonFile("appsettings.json", false, true);
+            builder.AddJsonFile($"appsettings.{enviroment}.json", true, true);
+            builder.AddEnvironmentVariables();
+        });
+
+        return host;
+    }
+
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
         AddInfrastructure(builder);

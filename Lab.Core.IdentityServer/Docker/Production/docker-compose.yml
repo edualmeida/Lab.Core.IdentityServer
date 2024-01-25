@@ -1,0 +1,23 @@
+version: '3'
+services:
+  core-identityserver:
+    container_name: core-identityserver
+    build: 
+      context: ../../../
+      dockerfile: Lab.Core.IdentityServer/Docker/Local/Dockerfile
+    ports: 
+      - "5002:8080"
+    networks:
+      - pgsqlnet
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment:
+        ASPNETCORE_ENVIRONMENT: Production
+networks:
+  pgsqlnet:
+    name: tulip-net
+    external: true
