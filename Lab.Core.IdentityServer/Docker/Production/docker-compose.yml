@@ -6,7 +6,7 @@ services:
       context: ../../../
       dockerfile: Lab.Core.IdentityServer/Docker/Local/Dockerfile
     ports: 
-      - "5002:8080"
+      - "5001:8080"
     networks:
       - pgsqlnet
     deploy:
