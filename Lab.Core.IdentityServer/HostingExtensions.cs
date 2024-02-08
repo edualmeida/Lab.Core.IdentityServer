@@ -68,7 +68,6 @@ internal static class HostingExtensions
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
-        // configure the application cookie
         builder.Services.ConfigureApplicationCookie(options =>
         {
             options.Cookie.SameSite = SameSiteMode.None;
